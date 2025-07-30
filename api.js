@@ -558,19 +558,14 @@ function readJsonSync(path) {
 
 function cors() {
 
-    var rules = [];
+    var allowedOrigins = [];
     if (fs.existsSync(ruleFile)) {
-        rules = readJsonSync(ruleFile).map(function(entry) {
-            return new RegExp(entry);
-        });
+        allowedOrigins = readJsonSync(ruleFile);
     }
 
     return function(req, res, next) {
-        for (var i = 0; i < rules.length; i++) {
-            if (rules[i].test(req.headers.origin)) {
-                res.header("Access-Control-Allow-Origin", req.headers.origin);
-                break;
-            }
+        if (allowedOrigins.includes(req.headers.origin)) {
+            res.header("Access-Control-Allow-Origin", req.headers.origin);
         }
         return next();
     }
